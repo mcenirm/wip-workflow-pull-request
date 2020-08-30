@@ -17,6 +17,8 @@ jobs:
         git checkout -b $branch
         echo $RANDOM > number.txt
         git add number.txt
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "${GITHUB_REPOSITORY//\//+}+${GITHUB_WORKFLOW// /-}@github.io"
         git commit -F number.txt
         git push origin $branch
         echo "::set-output name=branch::$branch"
