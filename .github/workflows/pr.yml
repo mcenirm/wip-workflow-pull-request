@@ -1,0 +1,33 @@
+name: Make a pull request
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: Fake input
+        default: fake
+        required: false
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - id: changes
+      run: |
+        branch=s$(date +%s)
+        git checkout -b $branch
+        echo $RANDOM > number.txt
+        git add number.txt
+        git commit -F number.txt
+        git push origin $branch
+        echo "::set-output name=branch::$branch"
+    - uses: actions/github-script@v3
+      id: make-pr
+      with:
+        script: |
+          github.pulls.create({
+            context.repo.owner,
+            context.repo.repo,
+            "run number "+context.runNumber.toString(),
+            "${{ steps.changes.outputs.branch }}",
+            "main",
+          });
